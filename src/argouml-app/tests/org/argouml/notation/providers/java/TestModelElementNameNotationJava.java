@@ -59,6 +59,15 @@ public class TestModelElementNameNotationJava extends TestCase {
         return model;
     }
 
+
+        private void configureClassNamespace(Object pack1, Object parentNamespace) {
+        Model.getCoreHelper().setNamespace(pack1, parentNamespace);
+        Object pack2 = Model.getModelManagementFactory().buildPackage("p2");
+        Model.getCoreHelper().setNamespace(pack2, pack1);
+        Model.getCoreHelper().setNamespace(theClass, pack2);
+        Model.getCoreHelper().setAbstract(theClass, false);
+    }
+    
     protected void setUp() throws Exception {
         super.setUp();
         InitializeModel.initializeDefault();
@@ -66,17 +75,15 @@ public class TestModelElementNameNotationJava extends TestCase {
         model = Model.getModelManagementFactory().createModel();
         theClass = Model.getCoreFactory().buildClass("TheClass", getModel());
     }
+
+    
     
     /**
      * Test if we can parse a class path and set it abstract.
      */
     public void testParsingPath() {
         Object pack1 = Model.getModelManagementFactory().buildPackage("p1");
-        Model.getCoreHelper().setNamespace(pack1, getModel());
-        Object pack2 = Model.getModelManagementFactory().buildPackage("p2");
-        Model.getCoreHelper().setNamespace(pack2, pack1);
-        Model.getCoreHelper().setNamespace(theClass, pack2);
-        Model.getCoreHelper().setAbstract(theClass, false);
+        configureClassNamespace(pack1, getModel());
         assertFalse("Could not build a non-abstract class", 
                 Model.getFacade().isAbstract(theClass));
         ModelElementNameNotation notation = 
@@ -98,11 +105,7 @@ public class TestModelElementNameNotationJava extends TestCase {
         Model.getCoreHelper().setName(mod1, "mod1");
         Model.getCoreHelper().setNamespace(mod1, getModel());
         Object pack1 = Model.getModelManagementFactory().buildPackage("p1");
-        Model.getCoreHelper().setNamespace(pack1, mod1);
-        Object pack2 = Model.getModelManagementFactory().buildPackage("p2");
-        Model.getCoreHelper().setNamespace(pack2, pack1);
-        Model.getCoreHelper().setNamespace(theClass, pack2);
-        Model.getCoreHelper().setAbstract(theClass, false);
+        configureClassNamespace(pack1, mod1);
         ModelElementNameNotation notation = 
             new ModelElementNameNotationJava(theClass);
         notation.parse(theClass, "abstract mod1.p1.p2.TheClass");
