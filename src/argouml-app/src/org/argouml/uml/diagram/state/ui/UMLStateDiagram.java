@@ -43,8 +43,6 @@ import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,30 +53,14 @@ import org.argouml.model.DeleteInstanceEvent;
 import org.argouml.model.Model;
 import org.argouml.model.StateDiagram;
 import org.argouml.ui.CmdCreateNode;
-import org.argouml.uml.diagram.DiagramElement;
-import org.argouml.uml.diagram.DiagramFactory;
-import org.argouml.uml.diagram.DiagramSettings;
-import org.argouml.uml.diagram.UMLMutableGraphSupport;
+import org.argouml.uml.diagram.*;
 import org.argouml.uml.diagram.activity.ui.FigActionState;
 import org.argouml.uml.diagram.state.StateDiagramGraphModel;
 import org.argouml.uml.diagram.static_structure.ui.FigComment;
-import org.argouml.uml.diagram.ui.ActionSetMode;
 import org.argouml.uml.diagram.ui.FigNodeModelElement;
 import org.argouml.uml.diagram.ui.RadioAction;
-import org.argouml.uml.diagram.ui.UMLDiagram;
-import org.argouml.uml.ui.behavior.common_behavior.ActionNewActionSequence;
-import org.argouml.uml.ui.behavior.common_behavior.ActionNewCallAction;
-import org.argouml.uml.ui.behavior.common_behavior.ActionNewCreateAction;
-import org.argouml.uml.ui.behavior.common_behavior.ActionNewDestroyAction;
-import org.argouml.uml.ui.behavior.common_behavior.ActionNewReturnAction;
-import org.argouml.uml.ui.behavior.common_behavior.ActionNewSendAction;
-import org.argouml.uml.ui.behavior.common_behavior.ActionNewTerminateAction;
-import org.argouml.uml.ui.behavior.common_behavior.ActionNewUninterpretedAction;
-import org.argouml.uml.ui.behavior.state_machines.ButtonActionNewGuard;
-import org.argouml.util.ToolBarUtility;
 import org.tigris.gef.base.LayerPerspective;
 import org.tigris.gef.base.LayerPerspectiveMutable;
-import org.tigris.gef.base.ModeCreatePolyEdge;
 import org.tigris.gef.presentation.FigNode;
 
 
@@ -88,7 +70,7 @@ import org.tigris.gef.presentation.FigNode;
  * The correct name for this class would be
  * "UMLStatechartDiagram". See issue 2306.
  */
-public class UMLStateDiagram extends UMLDiagram implements StateDiagram {
+public class UMLStateDiagram extends UMLActionDiagram implements StateDiagram {
 
     private static final long serialVersionUID = -1541136327444703151L;
 
@@ -108,28 +90,9 @@ public class UMLStateDiagram extends UMLDiagram implements StateDiagram {
     private Action actionSynchState;
     private Action actionSubmachineState;
     private Action actionCompositeState;
-    private Action actionStartPseudoState;
-    private Action actionFinalPseudoState;
     private Action actionBranchPseudoState;
-    private Action actionForkPseudoState;
-    private Action actionJoinPseudoState;
     private Action actionShallowHistoryPseudoState;
     private Action actionDeepHistoryPseudoState;
-    private Action actionCallEvent;
-    private Action actionChangeEvent;
-    private Action actionSignalEvent;
-    private Action actionTimeEvent;
-    private Action actionGuard;
-    private Action actionCallAction;
-    private Action actionCreateAction;
-    private Action actionDestroyAction;
-    private Action actionReturnAction;
-    private Action actionSendAction;
-    private Action actionTerminateAction;
-    private Action actionUninterpretedAction;
-    private Action actionActionSequence;
-    private Action actionTransition;
-    private Action actionJunctionPseudoState;
 
     /**
      * Constructor used by PGML parser to create a new diagram.  Use of
@@ -432,32 +395,6 @@ public class UMLStateDiagram extends UMLDiagram implements StateDiagram {
         return actions.toArray();
     }
 
-    protected Object[] getTriggerActions() {
-        Object[] actions = {
-            getActionCallEvent(),
-            getActionChangeEvent(),
-            getActionSignalEvent(),
-            getActionTimeEvent(),
-        };
-        ToolBarUtility.manageDefault(actions, "diagram.state.trigger");
-        return actions;
-    }
-
-    protected Object[] getEffectActions() {
-        Object[] actions = {
-            getActionCallAction(),
-            getActionCreateAction(),
-            getActionDestroyAction(),
-            getActionReturnAction(),
-            getActionSendAction(),
-            getActionTerminateAction(),
-            getActionUninterpretedAction(),
-            getActionActionSequence(),
-        };
-        ToolBarUtility.manageDefault(actions, "diagram.state.effect");
-        return actions;
-    }
-
     /*
      * @see org.argouml.uml.diagram.ui.UMLDiagram#getLabelName()
      */
@@ -502,53 +439,6 @@ public class UMLStateDiagram extends UMLDiagram implements StateDiagram {
         return actionDeepHistoryPseudoState;
     }
     /**
-     * @return Returns the actionFinalPseudoState.
-     */
-    protected Action getActionFinalPseudoState() {
-        if (actionFinalPseudoState == null) {
-            actionFinalPseudoState =
-                new RadioAction(
-                        new CmdCreateNode(
-                                Model.getMetaTypes().getFinalState(),
-                                "button.new-finalstate"));
-        }
-        return actionFinalPseudoState;
-    }
-    /**
-     * @return Returns the actionForkPseudoState.
-     */
-    protected Action getActionForkPseudoState() {
-        if (actionForkPseudoState == null) {
-            actionForkPseudoState = new RadioAction(
-                    new ActionCreatePseudostate(
-                            Model.getPseudostateKind()
-                            .getFork(), "button.new-fork"));
-        }
-        return actionForkPseudoState;
-    }
-    /**
-     * @return Returns the actionJoinPseudoState.
-     */
-    protected Action getActionJoinPseudoState() {
-        if (actionJoinPseudoState == null) {
-            actionJoinPseudoState = new RadioAction(new ActionCreatePseudostate(
-                    Model.getPseudostateKind().getJoin(), "button.new-join"));
-        }
-        return actionJoinPseudoState;
-    }
-    /**
-     * @return Returns the actionJunctionPseudoState.
-     */
-    protected Action getActionJunctionPseudoState() {
-        if (actionJunctionPseudoState == null) {
-            actionJunctionPseudoState = new RadioAction(
-                    new ActionCreatePseudostate(
-                        Model.getPseudostateKind().getJunction(),
-                        "button.new-junction"));
-        }
-        return actionJunctionPseudoState;
-    }
-    /**
      * @return Returns the actionShallowHistoryPseudoState.
      */
     protected Action getActionShallowHistoryPseudoState() {
@@ -561,18 +451,6 @@ public class UMLStateDiagram extends UMLDiagram implements StateDiagram {
         return actionShallowHistoryPseudoState;
     }
     /**
-     * @return Returns the actionStartPseudoState.
-     */
-    protected Action getActionStartPseudoState() {
-        if (actionStartPseudoState == null) {
-            actionStartPseudoState = new RadioAction(
-                    new ActionCreatePseudostate(
-                        Model.getPseudostateKind().getInitial(),
-                        "button.new-initial"));
-        }
-        return actionStartPseudoState;
-    }
-    /**
      * @return Returns the actionState.
      */
     protected Action getActionState() {
@@ -580,7 +458,7 @@ public class UMLStateDiagram extends UMLDiagram implements StateDiagram {
             actionState =
                 new RadioAction(
                         new CmdCreateNode(Model.getMetaTypes().getSimpleState(),
-                                          "button.new-simplestate"));
+                                "button.new-simplestate"));
         }
         return actionState;
     }
@@ -627,162 +505,12 @@ public class UMLStateDiagram extends UMLDiagram implements StateDiagram {
         return actionStubState;
     }
 
-    /**
-     * @return Returns the actionTransition.
-     */
-    protected Action getActionTransition() {
-        if (actionTransition == null) {
-            actionTransition = new RadioAction(
-                    new ActionSetMode(
-                        ModeCreatePolyEdge.class,
-                        "edgeClass",
-                        Model.getMetaTypes().getTransition(),
-                        "button.new-transition"));
-        }
-        return actionTransition;
-    }
-
-    /**
-     * @return Returns the actionCallEvent.
-     */
-    protected Action getActionCallEvent() {
-        if (actionCallEvent == null) {
-            actionCallEvent = new ButtonActionNewCallEvent();
-        }
-        return actionCallEvent;
-    }
-
-    /**
-     * @return Returns the actionCallEvent.
-     */
-    protected Action getActionChangeEvent() {
-        if (actionChangeEvent == null) {
-            actionChangeEvent = new ButtonActionNewChangeEvent();
-        }
-        return actionChangeEvent;
-    }
-
-    /**
-     * @return Returns the actionCallEvent.
-     */
-    protected Action getActionSignalEvent() {
-        if (actionSignalEvent == null) {
-            actionSignalEvent = new ButtonActionNewSignalEvent();
-        }
-        return actionSignalEvent;
-    }
-
-    /**
-     * @return Returns the actionCallEvent.
-     */
-    protected Action getActionTimeEvent() {
-        if (actionTimeEvent == null) {
-            actionTimeEvent = new ButtonActionNewTimeEvent();
-        }
-        return actionTimeEvent;
-    }
-
-    protected Action getActionGuard() {
-        if (actionGuard == null) {
-            actionGuard = new ButtonActionNewGuard();
-        }
-        return actionGuard;
-    }
-
-    protected Action getActionCallAction() {
-        if (actionCallAction == null) {
-            actionCallAction = ActionNewCallAction.getButtonInstance();
-        }
-        return actionCallAction;
-    }
-
-    protected Action getActionCreateAction() {
-        if (actionCreateAction == null) {
-            actionCreateAction = ActionNewCreateAction.getButtonInstance();
-        }
-        return actionCreateAction;
-    }
-
-    protected Action getActionDestroyAction() {
-        if (actionDestroyAction == null) {
-            actionDestroyAction = ActionNewDestroyAction.getButtonInstance();
-        }
-        return actionDestroyAction;
-    }
-
-    protected Action getActionReturnAction() {
-        if (actionReturnAction == null) {
-            actionReturnAction = ActionNewReturnAction.getButtonInstance();
-        }
-        return actionReturnAction;
-    }
-
-    protected Action getActionSendAction() {
-        if (actionSendAction == null) {
-            actionSendAction = ActionNewSendAction.getButtonInstance();
-        }
-        return actionSendAction;
-    }
-
-    protected Action getActionTerminateAction() {
-        if (actionTerminateAction == null) {
-            actionTerminateAction =
-                ActionNewTerminateAction.getButtonInstance();
-        }
-        return actionTerminateAction;
-    }
-
-    protected Action getActionUninterpretedAction() {
-        if (actionUninterpretedAction == null) {
-            actionUninterpretedAction =
-                ActionNewUninterpretedAction.getButtonInstance();
-        }
-        return actionUninterpretedAction;
-    }
-
-
-    protected Action getActionActionSequence() {
-        if (actionActionSequence == null) {
-            actionActionSequence =
-                ActionNewActionSequence.getButtonInstance();
-        }
-        return actionActionSequence;
-    }
-
     /*
      * @see org.argouml.uml.diagram.ui.UMLDiagram#getDependentElement()
      */
     @Override
     public Object getDependentElement() {
         return getStateMachine();
-    }
-
-    /*
-     * @see org.argouml.uml.diagram.ui.UMLDiagram#isRelocationAllowed(java.lang.Object)
-     */
-    public boolean isRelocationAllowed(Object base)  {
-        return false;
-        /* TODO: We may return the following when the
-         * relocate() has been implemented. */
-//      Model.getStateMachinesHelper()
-//              .isAddingStatemachineAllowed(base);
-    }
-
-    @SuppressWarnings("unchecked")
-    public Collection getRelocationCandidates(Object root) {
-        /* TODO: We may return something useful when the
-         * relocate() has been implemented, like
-         * all StateMachines that are not ActivityGraphs. */
-        Collection c =  new HashSet();
-        c.add(getOwner());
-        return c;
-    }
-
-    /*
-     * @see org.argouml.uml.diagram.ui.UMLDiagram#relocate(java.lang.Object)
-     */
-    public boolean relocate(Object base) {
-        return false;
     }
 
     public void encloserChanged(FigNode enclosed,
