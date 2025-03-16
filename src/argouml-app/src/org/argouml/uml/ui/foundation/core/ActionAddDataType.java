@@ -63,8 +63,38 @@ public class ActionAddDataType extends AbstractActionNewModelElement {
         putValue(Action.NAME, Translator.localize("button.new-datatype"));
     }
 
-    @Override
-    protected Object createModelElement(Object namespace) {
-        return Model.getCoreFactory().buildDataType("", namespace);
+    /*
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     */
+    public void actionPerformed(ActionEvent e) {
+        Object target = TargetManager.getInstance().getModelTarget();
+        Object ns = null;
+        if (Model.getFacade().isANamespace(target)) {
+            ns = target;
+        }
+        if (Model.getFacade().isAParameter(target)) {
+            if (Model.getFacade().getBehavioralFeature(target) != null) {
+                target = Model.getFacade().getBehavioralFeature(target);
+            }
+        }
+        if (Model.getFacade().isAFeature(target)) {
+            if (Model.getFacade().getOwner(target) != null) {
+                target = Model.getFacade().getOwner(target);
+            }
+        }
+        if (Model.getFacade().isAEvent(target)) {
+            ns = Model.getFacade().getNamespace(target);
+        }
+        if (Model.getFacade().isAClassifier(target)) {
+            ns = Model.getFacade().getNamespace(target);
+        }
+        if (Model.getFacade().isAAssociationEnd(target)) {
+            target = Model.getFacade().getAssociation(target);
+            ns = Model.getFacade().getNamespace(target);
+        }
+
+        Object newDt = Model.getCoreFactory().buildDataType("", ns);
+        TargetManager.getInstance().setTarget(newDt);
+        super.actionPerformed(e);
     }
 }
