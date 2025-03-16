@@ -1,8 +1,10 @@
-package org.argouml.ui;
+package org.argouml.ui.cmd;
 
 import javax.swing.JMenuItem;
 import org.argouml.ui.cmd.ShortcutMgr;
 import org.argouml.uml.ui.*;
+import org.argouml.ui.UndoableAction;
+import org.argouml.ui.cmd.GenericArgoMenuBar;
 
 public class MenuBarHelper {
 
@@ -21,7 +23,7 @@ public class MenuBarHelper {
         menuBar.getCreateDiagramToolbar().setFloatable(true);
     }
 
-    private static void addMenuItem(GenericArgoMenuBar menuBar, Object action, String name, String shortcut) {
+    private static void addMenuItem(GenericArgoMenuBar menuBar, UndoableAction action, String name, String shortcut) {
         JMenuItem item = menuBar.getCreateDiagramMenu().add(action);
         menuBar.setMnemonic(item, name);
         menuBar.getCreateDiagramToolbar().add(action);
