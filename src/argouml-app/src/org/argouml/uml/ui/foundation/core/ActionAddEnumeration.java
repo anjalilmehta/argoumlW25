@@ -66,7 +66,7 @@ public class ActionAddEnumeration extends AbstractActionNewModelElement {
         putValue(Action.SMALL_ICON, icon);
     }
     
-    @Override
+    
     protected Object createModelElement(Object namespace) {
         return Model.getCoreFactory().buildEnumeration("", namespace);
     }
