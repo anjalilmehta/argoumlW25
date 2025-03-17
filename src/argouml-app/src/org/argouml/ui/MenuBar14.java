@@ -39,7 +39,7 @@
 package org.argouml.ui;
 
 import javax.swing.JMenuItem;
-
+import org.argouml.ui.cmd.MenuBarHelper;
 import org.argouml.ui.cmd.GenericArgoMenuBar;
 import org.argouml.ui.cmd.ShortcutMgr;
 import org.argouml.uml.ui.ActionActivityDiagram;
