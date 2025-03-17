@@ -63,7 +63,7 @@ public class ActionAddDataType extends AbstractActionNewModelElement {
         putValue(Action.NAME, Translator.localize("button.new-datatype"));
     }
 
-    @Override
+    
     protected Object createModelElement(Object namespace) {
         return Model.getCoreFactory().buildDataType("", namespace);
     }
