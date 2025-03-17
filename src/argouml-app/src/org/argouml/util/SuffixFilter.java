@@ -52,28 +52,19 @@ public class SuffixFilter extends FileFilter {
     private final String desc;
 
     /**
-     * Construct a file filter files with the given suffix and description.
-     *
-     * @param suffix the suffix string
-     * @param d the file type description
+     * suffix filter refactored by simranjeet kaur
+     * @param suffixesInput
+     * @param d
      */
-    public SuffixFilter(String suffix, String d) {
-        suffixes = new String[] {suffix};
-	desc = d;
-    }
+    public SuffixFilter(Object suffixesInput, String d) {
+        // Ensure suffixesInput is treated as an array of strings
+        suffixes = (suffixesInput instanceof String[])
+          ? (String[]) suffixesInput
+          : new String[] {(String) suffixesInput};
 
-    /**
-     * Construct a filter for an array of suffixes
-     *
-     * @param s the suffixes string
-     * @param d the file type description
-     */
-    public SuffixFilter(String[] s, String d) {
-        suffixes = new String[s.length];
-        System.arraycopy(s, 0, suffixes, 0, s.length);
         desc = d;
     }
-    
+
     /*
      * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
      */
