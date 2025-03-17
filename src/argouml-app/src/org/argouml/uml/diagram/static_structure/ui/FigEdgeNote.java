@@ -210,25 +210,7 @@ public class FigEdgeNote extends FigEdgePoly
      */
     @Override
     public void setDestFigNode(FigNode fn) {
-        // When this is called from PGMLStackParser.attachEdges, we finished
-        // the initialization of owning pseudo element (CommentEdge)
-        if (fn != null && Model.getFacade().isAComment(fn.getOwner())) {
-            Object oldComment = comment;
-            if (oldComment != null) {
-                removeElementListener(oldComment);
-            }
-            comment = fn.getOwner();
-            if (comment != null) {
-                addElementListener(comment);
-            }
-
-            ((CommentEdge) getOwner()).setComment(comment);
-        } else if (fn != null
-                && !Model.getFacade().isAComment(fn.getOwner())) {
-            annotatedElement = fn.getOwner();
-            ((CommentEdge) getOwner()).setAnnotatedElement(annotatedElement);
-        }
-
+        updateCommentOrAnnotatedElement(fn);
         super.setDestFigNode(fn);
     }
 
@@ -237,24 +219,31 @@ public class FigEdgeNote extends FigEdgePoly
      */
     @Override
     public void setSourceFigNode(FigNode fn) {
-        // When this is called from PGMLStackParser.attachEdges, we finished
-        // the initialization of owning pseudo element (CommentEdge)
-        if (fn != null && Model.getFacade().isAComment(fn.getOwner())) {
-            Object oldComment = comment;
-            if (oldComment != null) {
-                removeElementListener(oldComment);
-            }
-            comment = fn.getOwner();
+        updateCommentOrAnnotatedElement(fn);
+        super.setSourceFigNode(fn);
+    }
+
+    /**
+     * Helper method to update the comment or annotated element.
+     */
+    private void updateCommentOrAnnotatedElement(FigNode fn) {
+        if (fn == null) {
+            return;
+        }
+
+        Object owner = fn.getOwner();
+
+        if (Model.getFacade().isAComment(owner)) {
             if (comment != null) {
-                addElementListener(comment);
+                removeElementListener(comment);
             }
+            comment = owner;
+            addElementListener(comment);
             ((CommentEdge) getOwner()).setComment(comment);
-        } else if (fn != null
-                && !Model.getFacade().isAComment(fn.getOwner())) {
-            annotatedElement = fn.getOwner();
+        } else {
+            annotatedElement = owner;
             ((CommentEdge) getOwner()).setAnnotatedElement(annotatedElement);
         }
-        super.setSourceFigNode(fn);
     }
 
     private void addElementListener(Object element) {
