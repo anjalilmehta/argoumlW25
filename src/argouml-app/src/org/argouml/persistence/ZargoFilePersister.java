@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
@@ -245,9 +246,26 @@ class ZargoFilePersister extends UmlFilePersister {
         String releaseVersion;
         try {
             String argoEntry = getEntryNames(file, ".argo").iterator().next();
-            URL argoUrl = makeZipEntryUrl(toURL(file), argoEntry);
-            fileVersion = getPersistenceVersion(argoUrl.openStream());
-            releaseVersion = getReleaseVersion(argoUrl.openStream());
+
+// Validate the entry name to prevent SSRF and path traversal
+            if (!argoEntry.matches("[\\w\\-./]+\\.argo")) {
+                throw new IllegalArgumentException("Invalid or unsafe file entry.");
+            }
+
+            ZipFile zip = new ZipFile(file);
+            ZipEntry entry = zip.getEntry(argoEntry);
+            if (entry == null) {
+                throw new FileNotFoundException("Entry not found in zip.");
+            }
+
+            InputStream stream1 = zip.getInputStream(entry);
+            fileVersion = getPersistenceVersion(stream1);
+            stream1.close(); // Close after use
+
+            InputStream stream2 = zip.getInputStream(entry);
+            releaseVersion = getReleaseVersion(stream2);
+            stream2.close(); // Close after use
+
         } catch (MalformedURLException e) {
             throw new OpenException(e);
         } catch (IOException e) {
