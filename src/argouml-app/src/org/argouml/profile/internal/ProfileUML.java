@@ -224,7 +224,7 @@ public class ProfileUML extends Profile {
                     Translator.localize("wfr.UML142.AssociationClass.1-desc"),
                     ToDoItem.HIGH_PRIORITY, null, null, "http://www.uml.org/"));
         } catch (InvalidOclException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Error adding critic for AssociationClass constraint.", e);
         }
 
         // 4.5.3.2 [2]
