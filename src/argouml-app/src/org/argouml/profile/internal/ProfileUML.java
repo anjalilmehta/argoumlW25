@@ -286,7 +286,7 @@ public class ProfileUML extends Profile {
                     Translator.localize("wfr.UML142.DataType.1-desc"),
                     ToDoItem.HIGH_PRIORITY, null, null, "http://www.uml.org/"));
         } catch (InvalidOclException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, "Error in loadWellFormednessRules when adding new critics to context DataType inv", e);
         }
 
         // GeneralizableElement
