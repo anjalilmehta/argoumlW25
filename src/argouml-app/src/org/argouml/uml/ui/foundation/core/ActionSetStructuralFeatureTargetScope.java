@@ -62,7 +62,7 @@ public class ActionSetStructuralFeatureTargetScope extends UndoableAction {
     /**
      * Constructor for ActionSetCompositeStateConcurrent.
      */
-    protected ActionSetStructuralFeatureTargetScope() {
+    private ActionSetStructuralFeatureTargetScope() {
         super(Translator.localize("Set"), null);
         // Set the tooltip string:
         putValue(Action.SHORT_DESCRIPTION, 
