@@ -758,24 +758,30 @@ public class UserDefinedProfile extends Profile {
         }
     }
 
-    private FigNodeDescriptor loadImage(String stereotype, File f)
-        throws IOException {
+    private FigNodeDescriptor loadImage(String stereotype, File f) throws IOException {
         FigNodeDescriptor descriptor = new FigNodeDescriptor();
-        descriptor.length = (int) f.length();
-        descriptor.src = f.getPath();
-        descriptor.stereotype = stereotype;
 
-        BufferedInputStream bis = new BufferedInputStream(
-                new FileInputStream(f));
+        // Define a secure base directory, such as a configured assets/images folder
+        File safeBaseDir = new File("/app/resources/images").getCanonicalFile();
+        File canonicalFile = f.getCanonicalFile();
 
-        byte[] buf = new byte[descriptor.length];
-        try {
-            bis.read(buf);
-        } catch (IOException e) {
-            e.printStackTrace();
+        // Validate that the file is within the allowed directory
+        if (!canonicalFile.getPath().startsWith(safeBaseDir.getPath())) {
+            throw new SecurityException("Attempted path traversal attack: " + f.getPath());
         }
 
-        descriptor.img = new ImageIcon(buf).getImage();
+        descriptor.length = (int) canonicalFile.length();
+        descriptor.src = canonicalFile.getPath();
+        descriptor.stereotype = stereotype;
+
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(canonicalFile))) {
+            byte[] buf = new byte[descriptor.length];
+            int readBytes = bis.read(buf);
+            if (readBytes != descriptor.length) {
+                throw new IOException("Failed to read the complete file.");
+            }
+            descriptor.img = new ImageIcon(buf).getImage();
+        }
 
         return descriptor;
     }
