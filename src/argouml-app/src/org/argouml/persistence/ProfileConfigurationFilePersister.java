@@ -253,8 +253,8 @@ public class ProfileConfigurationFilePersister extends MemberFilePersister {
 		w.println("</profile>");
 	    }
 	} catch (Exception e) {
-	    LOGGER.log("context", e);
-	    throw new SaveException(e);
+	    LOG.log(Level.SEVERE, "Error in profile", e);
+	    // throw new SaveException(e);
 	}
     }
 
